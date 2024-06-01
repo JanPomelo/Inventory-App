@@ -9,6 +9,8 @@ import helmet from 'helmet';
 import express, { Request, Response, NextFunction } from 'express';
 import logger from 'jet-logger';
 import mongoose from 'mongoose';
+import { ItemsRouter } from '@src/routes/items';
+import { CategoriesRouter } from '@src/routes/categories';
 
 import 'express-async-errors';
 
@@ -63,6 +65,13 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
 // Add APIs, must be after middleware
 app.use(Paths.Base, BaseRouter);
 
+app.get('/', (req: Request, res: Response, next: NextFunction) => {
+       res.redirect('/items');
+});
+
+app.use('/items', ItemsRouter);
+app.use('/categories', CategoriesRouter);
+
 // Add error handler
 app.use((
   err: Error,
@@ -91,16 +100,6 @@ app.set('views', viewsDir);
 // Set static directory (js and css).
 const staticDir = path.join(__dirname, 'public');
 app.use(express.static(staticDir));
-
-// Nav to users pg by default
-app.get('/', (_: Request, res: Response) => {
-  return res.redirect('/users');
-});
-
-// Redirect to login if not logged in.
-app.get('/users', (_: Request, res: Response) => {
-  return res.sendFile('users.html', { root: viewsDir });
-});
 
 
 // **** Export default **** //
