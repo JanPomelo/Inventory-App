@@ -35,6 +35,7 @@ const app = express();
 // Connect to MongoDB
 mongoose.set('strictQuery', false);
 const mongoDB = EnvVars.MongoUri;
+console.log(mongoDB);
 
 async function connectToDB(){
   try {

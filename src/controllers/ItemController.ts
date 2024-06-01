@@ -1,9 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
+import Item from '../models/Item';
+import { warn } from 'console';
 
 const ItemController = (() => {
 
   const index = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('All Items');
+    const items = await Item.find().exec();
+
+    if (items.length === 0) {
+      res.status(404).send('No items found.');
+    }
+
+    res.send(items);
   };
 
   const show = async (req: Request, res: Response, next: NextFunction) => {
