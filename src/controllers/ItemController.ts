@@ -1,15 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import Item from '../models/Item';
-import { warn } from 'console';
 
 const ItemController = (() => {
 
   const index = async (req: Request, res: Response, next: NextFunction) => {
     const items = await Item.find().exec();
-
-    if (items.length === 0) {
-      res.status(404).send('No items found.');
-    }
 
     res.render('items/index', { title: "Items", items: items });
   };
