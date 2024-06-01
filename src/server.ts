@@ -35,7 +35,6 @@ const app = express();
 // Connect to MongoDB
 mongoose.set('strictQuery', false);
 const mongoDB = EnvVars.MongoUri;
-console.log(mongoDB);
 
 async function connectToDB(){
   try {
@@ -47,6 +46,10 @@ async function connectToDB(){
 connectToDB();
 
 // **** Setup **** //
+
+// Set View Engine
+
+app.set('view engine', 'pug');
 
 // Basic middleware
 app.use(express.json());

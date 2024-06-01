@@ -11,7 +11,7 @@ const ItemController = (() => {
       res.status(404).send('No items found.');
     }
 
-    res.send(items);
+    res.render('items/index', { title: "Items", items: items });
   };
 
   const show = async (req: Request, res: Response, next: NextFunction) => {

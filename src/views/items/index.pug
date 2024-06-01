@@ -1,0 +1,11 @@
+extends ../layout
+block content
+  h1.text-xl.font-bold.mb-8= title
+  if (items.length)
+    ul.ml-4
+      each item in items
+        li.mb-4
+          a.text-lg.mb-2(href=item.url)= item.name
+          p.ml-2= item.description
+  else
+    p No items!
