@@ -10,7 +10,7 @@ const ItemController = (() => {
   };
 
   const show = async (req: Request, res: Response, next: NextFunction) => {
-    const item = await Item.findById(req.params.id).exec();
+    const item = await Item.findById(req.params.id).populate('category').exec();
 
     if (!item) {
       res.status(404).send('Item not found');

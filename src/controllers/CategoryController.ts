@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
+import Category from '../models/Category';
 
 const CategoryController = (() => {
 
   const index = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('All Categories');
+    const categories = await Category.find().exec();
+
+    res.render('categories/index', { title: "Categories", categories: categories });
   }
 
   const show = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,0 +1,9 @@
+extends ../layout
+block content
+  h1.text-xl.font-bold.mb-8= title
+  p #[strong Description:] !{item.description}
+  p #[strong Price:] !{item.price} $
+  p #[strong Pieces Available:] !{item.number_in_stock}
+  hr
+  p #[strong Category:] !{item.category.name}
+

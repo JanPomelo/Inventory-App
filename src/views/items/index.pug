@@ -5,7 +5,8 @@ block content
     ul.ml-4
       each item in items
         li.mb-4
-          a.text-lg.mb-2(href=item.url)= item.name
-          p.ml-2= item.description
+          div.flex.justify-between
+          a.text-lg.mb-2.underline(href=item.url)= item.name
+          p.text-md  !{item.price} $
   else
     p No items!
