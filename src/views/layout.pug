@@ -8,11 +8,13 @@ html(lang='en')
     script(src="https://cdn.tailwindcss.com")
     link(href="/stylesheets/styles.css", rel="stylesheet")
   body.w-screen.h-screen.bg-gray-100.grid.place-items-center
-    div(class="flex flex-col bg-white shadow-xl h-full max-w-5xl w-full")
-      div.flex.justify-center.items-center.h-16.gap-4.bg-black.text-white
-        a(href="/" class=currentRoute === "/" ? "font-bold underline decoration-2": "") Home
-        a(href="/items" class=currentRoute === "/items" ? "font-bold underline decoration-2" : "") Items
-        a(href="/categories" class=currentRoute === "/categories" ? "font-bold underline decoration-2" : "") Categories
-      div(class="p-4 h-full overflow-y-auto")
-        block content
+    div(class="flex bg-white shadow-xl h-full max-w-5xl w-full p-4 gap-6")
+        div(class="w-[12rem] flex flex-col gap-2")
+          a(href="/categories" class=currentRoute === "/categories" ? "font-bold underline decoration-2" : "") All categories
+          a(href="/categories/create" class=currentRoute === "/categories/create" ? "font-bold underline decoration-2" : "") Create new category
+          hr
+          a(href="/items" class=currentRoute === "/items" ? "font-bold underline decoration-2" : "") All items
+          a(href="/items/create" class=currentRoute === "/items/create" ? "font-bold underline decoration-2" : "") Create new item
+        .flex-grow
+          block content
 

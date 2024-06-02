@@ -4,8 +4,15 @@ block content
   h1= title
   p= category.description
   h2 Items in this category:
-  ul
-    each item in items
-      li
-        a(href=item.url)= item.name
-        p !{item.price} $
+  if items.length
+    ul
+      each item in items
+        li
+          a(href=item.url)= item.name
+          p !{item.price} $
+  else
+    p No items in this category yet.
+  hr
+  a(href=category.url+'/edit') Edit Category
+
+

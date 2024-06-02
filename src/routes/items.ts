@@ -3,11 +3,11 @@ import ItemController from '../controllers/ItemController';
 const router = express.Router();
 
 router.get('/', ItemController.index);
+router.get('/create', ItemController.create);
+router.post('/', ItemController.store);
 router.get('/:id', ItemController.show);
-router.post('/', ItemController.create);
-router.put('/:id', ItemController.update);
+router.patch('/:id', ItemController.update);
 router.delete('/:id', ItemController.destroy);
-router.post('/store', ItemController.store);
 router.get('/:id/edit', ItemController.edit);
 
 export { router as ItemsRouter }

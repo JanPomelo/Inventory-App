@@ -25,7 +25,7 @@ const CategoryController = (() => {
   }
 
   const create = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Create Category');
+    res.render('categories/create', { title: 'Create Category' })
   }
 
   const update = async (req: Request, res: Response, next: NextFunction) => {

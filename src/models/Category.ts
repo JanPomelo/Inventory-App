@@ -3,7 +3,6 @@ import ICategory from '../interfaces/Category';
 
 const CategorySchema: Schema = new Schema<ICategory>({
   name: { type: String, required: true, minlength: 3, maxlength: 100},
-  slug: { type: String, required: true, minlength: 3, maxlength: 100, unique: true},
   description: { type: String, required: true, minlength: 3, maxlength: 1000},
 });
 
