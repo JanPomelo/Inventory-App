@@ -1,18 +1,21 @@
 extends ../layout
 
 block content
-  h1= title
+  h1.text-2xl.font-bold.mb-8= title
   p= category.description
-  h2 Items in this category:
+  h2.my-4.text-xl.font-bold Items in this category:
   if items.length
-    ul
+    ul.ml-2
       each item in items
-        li
+        li.mb-2.list-disc
           a(href=item.url)= item.name
           p !{item.price} $
   else
     p No items in this category yet.
   hr
-  a(href=category.url+'/edit') Edit Category
+  p.my-4
+    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href=category.url+'/edit') Edit Category
+  p.my-4
+    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href=category.url+'/delete') Delete Category
 
 

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import Category from '../models/Category';
 import Item from '../models/Item';
 import { body, validationResult } from 'express-validator';
-import { permittedCrossDomainPolicies } from 'helmet';
 
 const CategoryController = (() => {
 
@@ -66,9 +65,40 @@ const CategoryController = (() => {
     }
   }];
 
-  const destroy = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Delete Category');
-  }
+  const destroy_get = async (req: Request, res: Response, next: NextFunction) => {
+    const [category, items] = await Promise.all([
+      Category.findById(req.params.id).exec(),
+      Item.find({ category: req.params.id }).exec()
+    ]);
+
+    if (!category) {
+      res.status(404).send('Category not found');
+      return;
+    }
+
+    res.render('categories/delete', { title: 'Delete Category', category: category, items: items });
+  };
+
+  const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
+    const [category, items] = await Promise.all([
+      Category.findById(req.params.id).exec(),
+      Item.find({ category: req.params.id }).exec(),
+    ]);
+
+    if (items.length > 0) {
+      // Book has bookinstances. Render in same way as for GET route.
+      res.render("categories.delete", {
+        title: "Delete Category",
+        category: category,
+        items: items,
+      });
+      return;
+    } else {
+      // Book has no bookinstances. Delete object and redirect to the list of books.
+      await Category.findByIdAndDelete(req.body.id).exec();
+      res.redirect("/categories");
+    }
+  };
 
   const store = [
     body('name', 'Name must have at least 3 characters')
@@ -121,7 +151,8 @@ const CategoryController = (() => {
     show,
     create,
     update,
-    destroy,
+    destroy_get,
+    destroy_post,
     store,
     edit
   }
