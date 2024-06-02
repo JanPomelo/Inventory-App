@@ -11,6 +11,7 @@ import logger from 'jet-logger';
 import mongoose from 'mongoose';
 import { ItemsRouter } from '@src/routes/items';
 import { CategoriesRouter } from '@src/routes/categories';
+import accessRoute from '@src/middleware/access-route';
 
 import 'express-async-errors';
 
@@ -52,6 +53,7 @@ connectToDB();
 app.set('view engine', 'pug');
 
 // Basic middleware
+app.use(accessRoute);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(EnvVars.CookieProps.Secret));
@@ -70,7 +72,7 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
 app.use(Paths.Base, BaseRouter);
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
-       res.redirect('/items');
+       res.render('home');
 });
 
 app.use('/items', ItemsRouter);
