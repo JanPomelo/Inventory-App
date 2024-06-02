@@ -16,10 +16,7 @@ block content
       textarea#description.border.border-grey-500.rounded-lg.px-2.py-1(
         placeholder='A brief description of the category'
         name='description'
-        required) if category
-          = category.Description
-        else
-          = ''
+        required)= undefined===category ? '' : category.description
     button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300") Submit
     if errors
       ul

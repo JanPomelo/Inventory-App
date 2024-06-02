@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Category from '../models/Category';
 import Item from '../models/Item';
+import { body, validationResult } from 'express-validator';
 
 const CategoryController = (() => {
 
@@ -25,7 +26,7 @@ const CategoryController = (() => {
   }
 
   const create = async (req: Request, res: Response, next: NextFunction) => {
-    res.render('categories/create', { title: 'Create Category' })
+    res.render('categories/form', { title: 'Create Category' })
   }
 
   const update = async (req: Request, res: Response, next: NextFunction) => {
@@ -36,9 +37,40 @@ const CategoryController = (() => {
     res.send('Delete Category');
   }
 
-  const store = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Store Category');
-  }
+  const store = [
+    body('name', 'Name must have at least 3 characters')
+      .trim()
+      .isLength({ min: 3 })
+      .escape(),
+    body('description', 'Description must have at least 3 characters')
+      .trim()
+      .isLength({ min: 3 })
+      .escape(),
+    async (req: Request, res: Response, next: NextFunction) => {
+
+      const errors = validationResult(req);
+
+      const category = new Category({
+        name: req.body.name,
+        description: req.body.description
+      });
+
+      if (!errors.isEmpty()) {
+        res.render('categories/form', {
+          title: 'Create Category',
+          category: category,
+          errors: errors.array()
+        });
+        return;
+      } else {
+        try {
+          await category.save();
+          res.redirect(category.url);
+        } catch (err) {
+          next(err);
+        }
+      }
+  }];
 
   const edit = async (req: Request, res: Response, next: NextFunction) => {
     res.send('Edit Category');
