@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Category from '../models/Category';
+import Item from '../models/Item';
 
 const CategoryController = (() => {
 
@@ -10,7 +11,17 @@ const CategoryController = (() => {
   }
 
   const show = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Category Details');
+    const [category, items] = await Promise.all([
+      Category.findById(req.params.id).exec(),
+      Item.find({ category: req.params.id }).exec()
+    ]);
+
+    if (!category) {
+      res.status(404).send('Category not found');
+      return;
+    }
+
+    res.render('categories/show', { title: category.name, category: category, items: items });
   }
 
   const create = async (req: Request, res: Response, next: NextFunction) => {

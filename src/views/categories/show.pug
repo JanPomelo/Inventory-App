@@ -1,0 +1,11 @@
+extends ../layout
+
+block content
+  h1= title
+  p= category.description
+  h2 Items in this category:
+  ul
+    each item in items
+      li
+        a(href=item.url)= item.name
+        p !{item.price} $
