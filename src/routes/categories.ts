@@ -4,9 +4,9 @@ const router = express.Router();
 
 router.get('/', CategoryController.index);
 router.get('/create', CategoryController.create);
-router.post('/', CategoryController.store);
+router.post('/create', CategoryController.store);
 router.get('/:id', CategoryController.show);
-router.patch('/:id', CategoryController.update);
+router.post('/:id/edit', CategoryController.update);
 router.delete('/:id', CategoryController.destroy);
 router.get('/:id/edit', CategoryController.edit);
 
