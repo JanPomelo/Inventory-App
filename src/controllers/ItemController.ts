@@ -10,7 +10,14 @@ const ItemController = (() => {
   };
 
   const show = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Item Details');
+    const item = await Item.findById(req.params.id).exec();
+
+    if (!item) {
+      res.status(404).send('Item not found');
+      return;
+    }
+
+    res.render('items/show', { title: item.name, item: item });
   };
 
   const create = async (req: Request, res: Response, next: NextFunction) => {
