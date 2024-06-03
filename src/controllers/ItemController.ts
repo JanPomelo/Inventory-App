@@ -28,12 +28,60 @@ const ItemController = (() => {
     res.render('items/form', { title: 'Create Item', categories: categories });
   };
 
-  const update = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Update Item');
+  const update = [
+    body('name', 'Name is required')
+      .trim()
+      .isLength({ min: 3 }).withMessage('Name must have at least 3 characters')
+      .escape(),
+    body('description', 'Description is required')
+      .trim()
+      .isLength({ min: 3 }).withMessage('Description must have at least 3 characters')
+      .escape(),
+    body('price', 'Price is required')
+      .isFloat( { min: 0 }).withMessage('Price must be a positive number')
+      .escape(),
+    body('number_in_stock', 'Number in stock is required')
+      .isInt( { min: 0}).withMessage('Number in stock must be a positive integer')
+      .escape(),
+    body('category', 'Category is required')
+      .isLength({ min: 1 })
+      .escape(),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const item = new Item({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        number_in_stock: req.body.number_in_stock,
+        category: req.body.category,
+        _id: req.params.id
+      });
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const categories = await Category.find().sort( {"name": 1} ).exec();
+
+        res.render('items/form', {
+          title: 'Edit Item',
+          item: item,
+          categories: categories,
+          errors: errors.array()
+        });
+        return;
+      } else {
+        try {
+          await Item.findByIdAndUpdate(req.params.id, item).exec();
+          res.redirect(item.url)
+        } catch (err) {
+          next(err);
+        }
+      }
+  }];
+
+  const destroy_get = async (req: Request, res: Response, next: NextFunction) => {
+    res.send('Delete Item');
   };
 
-  const destroy = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Delete Item');
+  const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
   };
 
   const store = [
@@ -87,7 +135,18 @@ const ItemController = (() => {
   }];
 
   const edit = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Edit Item');
+    const [item, categories] = await Promise.all([
+      Item.findById(req.params.id).exec(),
+      Category.find().sort( {"name": 1} ).exec()
+    ]);
+
+    if (!item) {
+      res.status(404).send('Item not found');
+      return;
+    }
+
+    res.render('items/form', { title: 'Edit Item', item: item, categories: categories });
+
   };
 
   return {

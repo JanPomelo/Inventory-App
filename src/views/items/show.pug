@@ -1,9 +1,13 @@
 extends ../layout
 block content
   h1.text-2xl.font-bold.mb-8= title
-  p #[strong Description:] !{item.description}
-  p #[strong Price:] !{item.price} $
-  p #[strong Pieces Available:] !{item.number_in_stock}
+  p.mb-2 #[strong Description:] !{item.description}
+  p.mb-2 #[strong Price:] !{item.price} $
+  p.mb-2 #[strong Pieces Available:] !{item.number_in_stock}
   hr
-  p #[strong Category:] !{item.category.name}
-
+  p.my-4 #[strong Category:] !{item.category.name}
+  hr
+  p.my-4
+    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href=item.url+'/edit') Edit item
+  p.my-4
+    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href=item.url+'/delete') Delete item

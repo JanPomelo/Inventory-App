@@ -44,7 +44,7 @@ block content
           if item
             option(
               value=category._id
-              selected=item.category._id.toString()===category._id.toString() ? 'selected' : '' ) #{category.name}
+              selected= item.category._id.toString()===category._id.toString()) #{category.name}
           else
             option(value=category._id) #{category.name}
     button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300") Submit
