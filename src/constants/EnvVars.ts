@@ -9,6 +9,11 @@ export default {
   NodeEnv: (process.env.NODE_ENV ?? ''),
   Port: (process.env.PORT ?? 0),
   MongoUri: (process.env.MONGO_DB_URI ?? ''),
+  Cloudinary: {
+    AppName: (process.env.CLOUDINARY_APP_NAME ?? ''),
+    ApiKey: (process.env.CLOUDINARY_API_KEY ?? ''),
+    ApiSecret: (process.env.CLOUDINARY_API_SECRET ?? ''),
+  },
   CookieProps: {
     Key: 'ExpressGeneratorTs',
     Secret: (process.env.COOKIE_SECRET ?? ''),

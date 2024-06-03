@@ -2,9 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 import Item from '../models/Item';
 import Category from '../models/Category';
 import { body, validationResult } from 'express-validator';
+import EnvVars from '../constants/EnvVars';
 import multer from 'multer';
+const storage = multer.diskStorage({
+  filename: function (req: Request,file,cb) {
+    cb(null, file.originalname)
+  }
+});
+const upload = multer({storage: storage});
 
-const upload = multer({ dest: 'uploads/' });
+import cloudinary from 'cloudinary';
+cloudinary.v2.config({
+  cloud_name: EnvVars.Cloudinary.AppName,
+  api_key: EnvVars.Cloudinary.ApiKey,
+  api_secret: EnvVars.Cloudinary.ApiSecret
+});
 
 const ItemController = (() => {
 
@@ -32,6 +44,7 @@ const ItemController = (() => {
   };
 
   const update = [
+    upload.single('img'),
     body('name', 'Name is required')
       .trim()
       .isLength({ min: 3 }).withMessage('Name must have at least 3 characters')
@@ -56,7 +69,8 @@ const ItemController = (() => {
         price: req.body.price,
         number_in_stock: req.body.number_in_stock,
         category: req.body.category,
-        _id: req.params.id
+        _id: req.params.id,
+        img: req.file ? req.file.filename : undefined
       });
 
       const errors = validationResult(req);
@@ -72,10 +86,30 @@ const ItemController = (() => {
         return;
       } else {
         try {
-          await Item.findByIdAndUpdate(req.params.id, item).exec();
-          res.redirect(item.url)
+          if (req.file) {
+            const result = await cloudinary.v2.uploader.upload(req.file.path);
+            item.img = result.secure_url; // Update the img field with the secure URL
+            await Item.findByIdAndUpdate(req.params.id, item).exec();
+            res.redirect('/items'); // Redirect to the items list or another appropriate page
+          } else {
+            await Item.findByIdAndUpdate(req.params.id, { name: item.name,
+              description: item.description,
+              price: item.price,
+              number_in_stock: item.number_in_stock,
+              category: item.category,
+              _id: item._id,
+            }).exec();
+            res.redirect('/items'); // Redirect to the items list or another appropriate page
+          }
         } catch (err) {
-          next(err);
+          console.error('Error creating item:', err);
+          const categories = await Category.find().sort({ "name": 1 }).exec();
+          res.render('items/form', {
+            title: 'Create Item',
+            item: item,
+            categories: categories,
+            errors: [{ msg: 'An error occurred while creating the item' }]
+          });
         }
       }
   }];
@@ -101,6 +135,7 @@ const ItemController = (() => {
   };
 
   const store = [
+    upload.single('img'),
     body('name', 'Name is required')
       .trim()
       .isLength({ min: 3 }).withMessage('Name must have at least 3 characters')
@@ -118,6 +153,13 @@ const ItemController = (() => {
     body('category', 'Category is required')
       .isLength({ min: 1 })
       .escape(),
+    body('img', 'Image is required')
+      .custom((value, { req }) => {
+        if (!req.file) {
+          return false;
+        }
+        return true;
+      }),
     async (req: Request, res: Response, next: NextFunction) => {
 
       const item = new Item({
@@ -125,14 +167,14 @@ const ItemController = (() => {
         description: req.body.description,
         price: req.body.price,
         number_in_stock: req.body.number_in_stock,
-        category: req.body.category
+        category: req.body.category,
+        img: req.file ? req.file.filename : undefined
       });
 
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
         const categories = await Category.find().sort( {"name": 1} ).exec();
-
         res.render('items/form', {
           title: 'Create Item',
           item: item,
@@ -142,10 +184,23 @@ const ItemController = (() => {
         return;
       } else {
         try {
-          await item.save();
-          res.redirect(item.url);
+          if (req.file) {
+            const result = await cloudinary.v2.uploader.upload(req.file.path);
+            item.img = result.secure_url; // Update the img field with the secure URL
+            console.log(item.img);
+          }
+
+          await item.save(); // Save the item after the image upload is complete
+          res.redirect('/items'); // Redirect to the items list or another appropriate page
         } catch (err) {
-          next(err);
+          console.error('Error creating item:', err);
+          const categories = await Category.find().sort({ "name": 1 }).exec();
+          res.render('items/form', {
+            title: 'Create Item',
+            item: item,
+            categories: categories,
+            errors: [{ msg: 'An error occurred while creating the item' }]
+          });
         }
       }
   }];
