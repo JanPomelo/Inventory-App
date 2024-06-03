@@ -47,7 +47,7 @@ block content
               selected= item.category._id.toString()===category._id.toString()) #{category.name}
           else
             option(value=category._id) #{category.name}
-    button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300") Submit
+    button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Submit
     if errors
       ul
         for error in errors
