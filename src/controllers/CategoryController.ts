@@ -86,7 +86,6 @@ const CategoryController = (() => {
     ]);
 
     if (items.length > 0) {
-      // Book has bookinstances. Render in same way as for GET route.
       res.render("categories.delete", {
         title: "Delete Category",
         category: category,
@@ -94,9 +93,12 @@ const CategoryController = (() => {
       });
       return;
     } else {
-      // Book has no bookinstances. Delete object and redirect to the list of books.
-      await Category.findByIdAndDelete(req.body.id).exec();
-      res.redirect("/categories");
+      try {
+        await Category.findByIdAndDelete(req.body.id).exec();
+        res.redirect("/categories");
+      } catch (err) {
+        next(err);
+      }
     }
   };
 

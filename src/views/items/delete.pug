@@ -1,0 +1,9 @@
+extends ../layout
+
+block content
+  h1.text-2xl.font-bold.mb-8= title
+  p Are you sure you want to delete this item?
+  form.mt-2.flex.gap-4(method="POST")
+    input#id.form-control(type='hidden', name='id', value=item._id )
+    button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type="submit" class="hover:bg-gray-300") Delete
+    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href="/items" class="hover:bg-gray-300") Cancel

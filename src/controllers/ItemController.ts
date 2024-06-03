@@ -78,10 +78,23 @@ const ItemController = (() => {
   }];
 
   const destroy_get = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Delete Item');
+    const item = await Item.findById(req.params.id).exec();
+
+    if (!item) {
+      res.status(404).send('Item not found');
+      return;
+    }
+
+    res.render('items/delete', { title: 'Delete Item', item: item });
   };
 
   const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await Item.findByIdAndDelete(req.body.id).exec();
+      res.redirect('/items');
+    } catch(err) {
+      next(err);
+    }
   };
 
   const store = [
@@ -146,7 +159,6 @@ const ItemController = (() => {
     }
 
     res.render('items/form', { title: 'Edit Item', item: item, categories: categories });
-
   };
 
   return {
@@ -154,7 +166,8 @@ const ItemController = (() => {
     show,
     create,
     update,
-    destroy,
+    destroy_get,
+    destroy_post,
     store,
     edit
   };
