@@ -4,11 +4,11 @@ const router = express.Router();
 
 router.get('/', ItemController.index);
 router.get('/create', ItemController.create);
-router.post('/', ItemController.store);
+router.post('/create', ItemController.store);
 router.get('/:id', ItemController.show);
-router.patch('/:id', ItemController.update);
 router.delete('/:id', ItemController.destroy);
 router.get('/:id/edit', ItemController.edit);
+router.post('/:id/edit', ItemController.update);
 
 export { router as ItemsRouter }
 

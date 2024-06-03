@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Item from '../models/Item';
+import Category from '../models/Category';
+import { body, validationResult } from 'express-validator';
 
 const ItemController = (() => {
 
@@ -21,7 +23,9 @@ const ItemController = (() => {
   };
 
   const create = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Create Item');
+    const categories = await Category.find().sort( {"name": 1} ).exec();
+
+    res.render('items/form', { title: 'Create Item', categories: categories });
   };
 
   const update = async (req: Request, res: Response, next: NextFunction) => {
@@ -32,9 +36,55 @@ const ItemController = (() => {
     res.send('Delete Item');
   };
 
-  const store = async (req: Request, res: Response, next: NextFunction) => {
-    res.send('Store Item');
-  };
+  const store = [
+    body('name', 'Name is required')
+      .trim()
+      .isLength({ min: 3 }).withMessage('Name must have at least 3 characters')
+      .escape(),
+    body('description', 'Description is required')
+      .trim()
+      .isLength({ min: 3 }).withMessage('Description must have at least 3 characters')
+      .escape(),
+    body('price', 'Price is required')
+      .isFloat( { min: 0 }).withMessage('Price must be a positive number')
+      .escape(),
+    body('number_in_stock', 'Number in stock is required')
+      .isInt( { min: 0}).withMessage('Number in stock must be a positive integer')
+      .escape(),
+    body('category', 'Category is required')
+      .isLength({ min: 1 })
+      .escape(),
+    async (req: Request, res: Response, next: NextFunction) => {
+
+      const item = new Item({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        number_in_stock: req.body.number_in_stock,
+        category: req.body.category
+      });
+
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        const categories = await Category.find().sort( {"name": 1} ).exec();
+
+        res.render('items/form', {
+          title: 'Create Item',
+          item: item,
+          categories: categories,
+          errors: errors.array()
+        });
+        return;
+      } else {
+        try {
+          await item.save();
+          res.redirect(item.url);
+        } catch (err) {
+          next(err);
+        }
+      }
+  }];
 
   const edit = async (req: Request, res: Response, next: NextFunction) => {
     res.send('Edit Item');
