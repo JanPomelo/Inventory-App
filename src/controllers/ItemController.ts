@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import Item from '../models/Item';
 import Category from '../models/Category';
 import { body, validationResult } from 'express-validator';
+import multer from 'multer';
+
+const upload = multer({ dest: 'uploads/' });
 
 const ItemController = (() => {
 
