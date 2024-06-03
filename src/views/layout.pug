@@ -9,7 +9,9 @@ html(lang='en')
     link(href="/stylesheets/styles.css", rel="stylesheet")
   body.w-screen.h-screen.bg-gray-100.grid.place-items-center
     div(class="flex bg-white shadow-xl h-full max-w-5xl w-full p-4 gap-6")
-        div(class="w-[12rem] flex flex-col gap-2")
+        div(class="w-[12rem] min-w-[12rem] flex flex-col gap-2")
+          a(href="/" class=currentRoute === "/" ? "font-bold underline decoration-2" : "") Home
+          hr
           a(href="/categories" class=currentRoute === "/categories" ? "font-bold underline decoration-2" : "") All categories
           a(href="/categories/create" class=currentRoute === "/categories/create" ? "font-bold underline decoration-2" : "") Create new category
           hr

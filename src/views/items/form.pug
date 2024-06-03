@@ -16,7 +16,7 @@ block content
       textarea#description.border.border-grey-500.rounded-lg.px-2.py-1(
         placeholder='A brief description of the item'
         name='description'
-        required)= undefined===item ? '' : item.Description
+        required)= undefined===item ? '' : item.description
     .mb-6.flex.flex-col.gap-2
       label(for='price' class="text-slate-500 uppercase text-xs") Price (USD):
       input#price.border.border-grey-500.rounded-lg.px-2.py-1(
