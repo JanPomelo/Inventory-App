@@ -1,9 +1,13 @@
 extends ../layout
 block content
   h1.text-2xl.font-bold.mb-8= title
-  p.mb-2 #[strong Description:] !{item.description}
-  p.mb-2 #[strong Price:] !{item.price} $
-  p.mb-2 #[strong Pieces Available:] !{item.number_in_stock}
+  .flex.justify-between
+    div
+      p.mb-2 #[strong Description:] !{item.description}
+      p.mb-2 #[strong Price:] !{item.price} $
+      p.mb-2 #[strong Pieces Available:] !{item.number_in_stock}
+    if item.img.includes('http')
+      img(src=item.img alt=item.name style="width: 300px; height: 300px;")
   hr
   p.my-4 #[strong Category:] !{item.category.name}
   hr

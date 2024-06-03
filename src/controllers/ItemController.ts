@@ -127,6 +127,7 @@ const ItemController = (() => {
 
   const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      await cloudinary.v2.uploader.destroy(req.body.img_id);
       await Item.findByIdAndDelete(req.body.id).exec();
       res.redirect('/items');
     } catch(err) {
