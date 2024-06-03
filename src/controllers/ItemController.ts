@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Item from '../models/Item';
+import IItem from '../interfaces/Item';
 import Category from '../models/Category';
 import { body, validationResult } from 'express-validator';
 import EnvVars from '../constants/EnvVars';
@@ -87,8 +88,12 @@ const ItemController = (() => {
       } else {
         try {
           if (req.file) {
+            const oldItem = await Item.findById(req.params.id).exec() as IItem;
             const result = await cloudinary.v2.uploader.upload(req.file.path);
             item.img = result.secure_url; // Update the img field with the secure URL
+            if (oldItem.img) {
+              await cloudinary.v2.uploader.destroy(oldItem.img.substring(oldItem.img.lastIndexOf('/') + 1, oldItem.img.lastIndexOf('.')));
+            }
             await Item.findByIdAndUpdate(req.params.id, item).exec();
             res.redirect('/items'); // Redirect to the items list or another appropriate page
           } else {
