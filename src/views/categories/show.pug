@@ -3,13 +3,17 @@ extends ../layout
 block content
   h1.text-2xl.font-bold.mb-8= title
   p= category.description
-  h2.my-4.text-xl.font-bold Items in this category:
+  h2.my-6.text-xl.font-bold Items in this category:
   if items.length
     ul.ml-2
       each item in items
-        li.mb-2.list-disc
-          a(href=item.url)= item.name
-          p !{item.price} $
+        li.mb-4
+          div.flex.justify-between.p-3.border.rounded-xl.shadow-xl(style="background-color: #F3F4F6; border-color: #2C3E50;")
+            div
+              a.text-lg.mb-2.underline(href=item.url)= item.name
+              p.text-md  !{item.price} $
+            if (item.img)
+              img.rounded-xl.border-2(src=item.img alt=item.name class="w-[200px] sm:w-[20%]" style="border-color: #C39C4E;")
   else
     p No items in this category yet.
   hr

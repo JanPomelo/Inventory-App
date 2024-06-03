@@ -10,7 +10,7 @@ block content
       img.rounded-xl.border-2(src=item.img alt=item.name class="w-[300px] sm:w-[40%]" style="border-color: #C39C4E;")
   hr.my-2
   p.my-4 #[strong Category: ]
-    a(href=item.category.url)= item.category.name
+    a.underline(href=item.category.url)= item.category.name
   hr.my-2
   p.my-4
     a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href=item.url+'/edit' style="background-color: #C39C4E; color: #FFFFFF;") Edit item
