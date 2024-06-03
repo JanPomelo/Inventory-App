@@ -7,4 +7,5 @@ export default interface IItem {
   number_in_stock: number;
   url: string;
   category: ICategory;
+  img?: string;
 }

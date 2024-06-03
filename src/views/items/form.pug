@@ -2,7 +2,7 @@ extends ../layout
 
 block content
   h1.text-2xl.font-bold.mb-8= title
-  form(method="POST")
+  form(method="POST" enctype="multipart/form-data")
     .mb-6.flex.flex-col.gap-2
       label(for='name' class="text-slate-500 uppercase text-xs") Name:
       input#name.border.border-grey-500.rounded-lg.px-2.py-1(
@@ -47,6 +47,8 @@ block content
               selected= item.category._id.toString()===category._id.toString()) #{category.name}
           else
             option(value=category._id) #{category.name}
+    .mb-6.flex.flex-col.gap-2
+      input.rounded-lg.px-2.py-1(type='file' name='img' accept='image/*' source=undefined===item? '' : item.img)
     button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Submit
     if errors
       ul
