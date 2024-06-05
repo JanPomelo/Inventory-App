@@ -12,6 +12,7 @@ import mongoose from 'mongoose';
 import { ItemsRouter } from '@src/routes/items';
 import { CategoriesRouter } from '@src/routes/categories';
 import accessRoute from '@src/middleware/access-route';
+import compression from 'compression';
 
 import 'express-async-errors';
 
@@ -51,6 +52,9 @@ connectToDB();
 // Set View Engine
 
 app.set('view engine', 'pug');
+
+// Prod middleware
+app.use(compression());
 
 // Basic middleware
 app.use(accessRoute);
