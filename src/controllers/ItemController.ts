@@ -63,6 +63,16 @@ const ItemController = (() => {
     body('category', 'Category is required')
       .isLength({ min: 1 })
       .escape(),
+    body('admin_pw', 'Admin Password Required')
+      .escape()
+      .trim()
+      .custom((value, { req }) => {
+        if (value === EnvVars.AdminPassword) {
+          return true;
+        } else {
+          return false;
+        }
+      }).withMessage('Wrong Admin Password'),
     async (req: Request, res: Response, next: NextFunction) => {
       const item = new Item({
         name: req.body.name,
@@ -82,6 +92,7 @@ const ItemController = (() => {
           title: 'Edit Item',
           item: item,
           categories: categories,
+          secure: true,
           errors: errors.array()
         });
         return;
@@ -130,15 +141,34 @@ const ItemController = (() => {
     res.render('items/delete', { title: 'Delete Item', item: item });
   };
 
-  const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await cloudinary.v2.uploader.destroy(req.body.img_id);
-      await Item.findByIdAndDelete(req.body.id).exec();
-      res.redirect('/items');
-    } catch(err) {
-      next(err);
-    }
-  };
+  const destroy_post = [
+    body('admin_pw', 'Admin Password Required')
+      .escape()
+      .trim()
+      .custom((value, { req }) => {
+        if (value === EnvVars.AdminPassword) {
+          return true;
+        } else {
+          return false;
+        }
+      }).withMessage('Wrong Admin Password'),
+    async (req: Request, res: Response, next: NextFunction) => {
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const item = await Item.findById(req.params.id).exec();
+
+        res.render('items/delete', { title: 'Delete Item', item: item, errors: errors.array()});
+      } else {
+        try {
+          await cloudinary.v2.uploader.destroy(req.body.img_id);
+          await Item.findByIdAndDelete(req.body.id).exec();
+          res.redirect('/items');
+        } catch(err) {
+          next(err);
+        }
+      }
+  }];
 
   const store = [
     upload.single('img'),
@@ -222,7 +252,7 @@ const ItemController = (() => {
       return;
     }
 
-    res.render('items/form', { title: 'Edit Item', item: item, categories: categories });
+    res.render('items/form', { title: 'Edit Item', item: item, categories: categories, secure: true });
   };
 
   return {
