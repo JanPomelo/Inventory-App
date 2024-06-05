@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Category from '../models/Category';
 import Item from '../models/Item';
 import { body, validationResult } from 'express-validator';
+import EnvVars from '@src/constants/EnvVars';
 
 const CategoryController = (() => {
 
@@ -79,11 +80,28 @@ const CategoryController = (() => {
     res.render('categories/delete', { title: 'Delete Category', category: category, items: items });
   };
 
-  const destroy_post = async (req: Request, res: Response, next: NextFunction) => {
+  const destroy_post = [
+    body('admin_pw', 'Admin Password Required')
+      .escape()
+      .trim()
+      .custom((value, { req }) => {
+        if (value === EnvVars.AdminPassword) {
+          return true;
+        } else {
+          return false;
+        }
+      }).withMessage('Wrong Admin Password'),
+    async (req: Request, res: Response, next: NextFunction) => {
     const [category, items] = await Promise.all([
       Category.findById(req.params.id).exec(),
       Item.find({ category: req.params.id }).exec(),
     ]);
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.render('categories/delete', { title: 'Delete Category', category: category, items: items, errors: errors.array() });
+    }
 
     if (items.length > 0) {
       res.render("categories.delete", {
@@ -100,7 +118,7 @@ const CategoryController = (() => {
         next(err);
       }
     }
-  };
+  }];
 
   const store = [
     body('name', 'Name must have at least 3 characters')
