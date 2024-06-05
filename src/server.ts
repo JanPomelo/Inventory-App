@@ -13,6 +13,7 @@ import { ItemsRouter } from '@src/routes/items';
 import { CategoriesRouter } from '@src/routes/categories';
 import accessRoute from '@src/middleware/access-route';
 import compression from 'compression';
+import { rateLimit } from 'express-rate-limit';
 
 import 'express-async-errors';
 
@@ -54,7 +55,6 @@ connectToDB();
 app.set('view engine', 'pug');
 
 // Prod middleware
-app.use(compression());
 
 // Basic middleware
 app.use(accessRoute);
@@ -69,7 +69,13 @@ if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
 
 // Security
 if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
+  app.use(compression());
   app.use(helmet());
+  const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 20,
+  });
+  app.use(limiter);
 }
 
 // Add APIs, must be after middleware
