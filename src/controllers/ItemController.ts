@@ -63,6 +63,16 @@ const ItemController = (() => {
     body('category', 'Category is required')
       .isLength({ min: 1 })
       .escape(),
+    body('admin_pw', 'Admin Password Required')
+      .escape()
+      .trim()
+      .custom((value, { req }) => {
+        if (value === EnvVars.AdminPassword) {
+          return true;
+        } else {
+          return false;
+        }
+      }).withMessage('Wrong Admin Password'),
     async (req: Request, res: Response, next: NextFunction) => {
       const item = new Item({
         name: req.body.name,
@@ -82,6 +92,7 @@ const ItemController = (() => {
           title: 'Edit Item',
           item: item,
           categories: categories,
+          secure: true,
           errors: errors.array()
         });
         return;
@@ -241,7 +252,7 @@ const ItemController = (() => {
       return;
     }
 
-    res.render('items/form', { title: 'Edit Item', item: item, categories: categories });
+    res.render('items/form', { title: 'Edit Item', item: item, categories: categories, secure: true });
   };
 
   return {
