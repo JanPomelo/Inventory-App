@@ -3,8 +3,19 @@ extends ../layout
 block content
   h1.text-2xl.font-bold.mb-8= title
   p Are you sure you want to delete this item?
-  form.mt-2.flex.gap-4(method="POST")
-    input#id.form-control(type='hidden', name='id', value=item._id )
+  form.mt-2(method="POST")
+    .mb-6.flex.flex-col.gap-2
+      label(for='admin_pw' class="text-slate-500 uppercase text-xs") Admin Password:
+      input#admin_pw.border.border-grey-500.rounded-lg.px-2.py-1(type='password'
+        name='admin_pw'
+        required)
+    input#id(type='hidden', name='id', value=item._id )
     input#img_id(type='hidden', name='img_id', value=item.img.substring(item.img.lastIndexOf('/') + 1, item.img.lastIndexOf('.')))
-    button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type="submit" class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Delete
-    a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href="/items" class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Cancel
+    .flex.gap-4
+      button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type="submit" class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Delete
+      a.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(href="/items" class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Cancel
+    div
+      if errors
+        ul
+          for error in errors
+            li!= error.msg

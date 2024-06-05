@@ -14,6 +14,7 @@ export default {
     ApiKey: (process.env.CLOUDINARY_API_KEY ?? ''),
     ApiSecret: (process.env.CLOUDINARY_API_SECRET ?? ''),
   },
+  AdminPassword: (process.env.ADMIN_PW ?? ''),
   CookieProps: {
     Key: 'ExpressGeneratorTs',
     Secret: (process.env.COOKIE_SECRET ?? ''),
