@@ -39,6 +39,16 @@ const CategoryController = (() => {
       .trim()
       .isLength({ min: 3 })
       .escape(),
+    body('admin_pw', 'Admin Password Required')
+      .escape()
+      .trim()
+      .custom((value, { req }) => {
+        if (value === EnvVars.AdminPassword) {
+          return true;
+        } else {
+          return false;
+        }
+      }).withMessage('Wrong Admin Password'),
     async (req: Request, res: Response, next: NextFunction) => {
 
     const category = new Category({
@@ -53,6 +63,7 @@ const CategoryController = (() => {
       res.render('categories/form', {
         title: 'Edit Category',
         category: category,
+        secure: true,
         errors: errors.array()
       });
       return;
@@ -163,7 +174,7 @@ const CategoryController = (() => {
       return;
     }
 
-    res.render('categories/form', { title: 'Edit Category', category: category });
+    res.render('categories/form', { title: 'Edit Category', category: category , secure: true});
   }
 
   return {
