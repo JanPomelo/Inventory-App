@@ -1,6 +1,9 @@
 {
   "name": "inventory-app",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=22.2.0"
+  },
   "scripts": {
     "build": "npx ts-node build.ts",
     "lint": "npx eslint --ext .ts src/",
