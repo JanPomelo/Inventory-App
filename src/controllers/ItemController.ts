@@ -5,10 +5,13 @@ import Category from '../models/Category';
 import { body, validationResult } from 'express-validator';
 import EnvVars from '../constants/EnvVars';
 import multer from 'multer';
+import UpdateItemRequest from '@src/requests/UpdateItemRequest';
+import DeleteItemRequest from '@src/requests/DeleteItemRequest';
+
 const storage = multer.diskStorage({
   filename: function (req: Request,file,cb) {
-    cb(null, file.originalname)
-  }
+    cb(null, file.originalname);
+  },
 });
 const upload = multer({storage: storage});
 
@@ -16,18 +19,18 @@ import cloudinary from 'cloudinary';
 cloudinary.v2.config({
   cloud_name: EnvVars.Cloudinary.AppName,
   api_key: EnvVars.Cloudinary.ApiKey,
-  api_secret: EnvVars.Cloudinary.ApiSecret
+  api_secret: EnvVars.Cloudinary.ApiSecret,
 });
 
 const ItemController = (() => {
 
-  const index = async (req: Request, res: Response, next: NextFunction) => {
+  const index = async (req: Request, res: Response) => {
     const items = await Item.find().exec();
 
-    res.render('items/index', { title: "Items", items: items });
+    res.render('items/index', { title: 'Items', items: items });
   };
 
-  const show = async (req: Request, res: Response, next: NextFunction) => {
+  const show = async (req: Request, res: Response) => {
     const item = await Item.findById(req.params.id).populate('category').exec();
 
     if (!item) {
@@ -35,13 +38,19 @@ const ItemController = (() => {
       return;
     }
 
-    res.render('items/show', { title: item.name, item: item });
+    res.render('items/show', {
+      title: item.name,
+      item: item,
+    });
   };
 
-  const create = async (req: Request, res: Response, next: NextFunction) => {
-    const categories = await Category.find().sort( {"name": 1} ).exec();
+  const create = async (req: Request, res: Response) => {
+    const categories = await Category.find().sort( {'name': 1} ).exec();
 
-    res.render('items/form', { title: 'Create Item', categories: categories });
+    res.render('items/form', {
+      title: 'Create Item',
+      categories: categories,
+    });
   };
 
   const update = [
@@ -52,13 +61,15 @@ const ItemController = (() => {
       .escape(),
     body('description', 'Description is required')
       .trim()
-      .isLength({ min: 3 }).withMessage('Description must have at least 3 characters')
+      .isLength({ min: 3 })
+      .withMessage('Description must have at least 3 characters')
       .escape(),
     body('price', 'Price is required')
       .isFloat( { min: 0 }).withMessage('Price must be a positive number')
       .escape(),
     body('number_in_stock', 'Number in stock is required')
-      .isInt( { min: 0}).withMessage('Number in stock must be a positive integer')
+      .isInt( { min: 0})
+      .withMessage('Number in stock must be a positive integer')
       .escape(),
     body('category', 'Category is required')
       .isLength({ min: 1 })
@@ -66,14 +77,14 @@ const ItemController = (() => {
     body('admin_pw', 'Admin Password Required')
       .escape()
       .trim()
-      .custom((value, { req }) => {
+      .custom((value) => {
         if (value === EnvVars.AdminPassword) {
           return true;
         } else {
           return false;
         }
       }).withMessage('Wrong Admin Password'),
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: UpdateItemRequest, res: Response) => {
       const item = new Item({
         name: req.body.name,
         description: req.body.description,
@@ -81,19 +92,19 @@ const ItemController = (() => {
         number_in_stock: req.body.number_in_stock,
         category: req.body.category,
         _id: req.params.id,
-        img: req.file ? req.file.filename : undefined
+        img: req.file ? req.file.filename : undefined,
       });
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        const categories = await Category.find().sort( {"name": 1} ).exec();
+        const categories = await Category.find().sort( {'name': 1} ).exec();
 
         res.render('items/form', {
           title: 'Edit Item',
           item: item,
           categories: categories,
           secure: true,
-          errors: errors.array()
+          errors: errors.array(),
         });
         return;
       } else {
@@ -101,12 +112,16 @@ const ItemController = (() => {
           if (req.file) {
             const oldItem = await Item.findById(req.params.id).exec() as IItem;
             const result = await cloudinary.v2.uploader.upload(req.file.path);
-            item.img = result.secure_url; // Update the img field with the secure URL
+            item.img = result.secure_url;
             if (oldItem.img) {
-              await cloudinary.v2.uploader.destroy(oldItem.img.substring(oldItem.img.lastIndexOf('/') + 1, oldItem.img.lastIndexOf('.')));
+              await cloudinary.v2.uploader.destroy(
+                oldItem.img.substring(
+                  oldItem.img.lastIndexOf('/') + 1, oldItem.img.lastIndexOf('.'),
+                ),
+              );
             }
             await Item.findByIdAndUpdate(req.params.id, item).exec();
-            res.redirect('/items'); // Redirect to the items list or another appropriate page
+            res.redirect('/items');
           } else {
             await Item.findByIdAndUpdate(req.params.id, { name: item.name,
               description: item.description,
@@ -115,22 +130,22 @@ const ItemController = (() => {
               category: item.category,
               _id: item._id,
             }).exec();
-            res.redirect('/items'); // Redirect to the items list or another appropriate page
+            res.redirect('/items');
           }
         } catch (err) {
           console.error('Error creating item:', err);
-          const categories = await Category.find().sort({ "name": 1 }).exec();
+          const categories = await Category.find().sort({ 'name': 1 }).exec();
           res.render('items/form', {
             title: 'Create Item',
             item: item,
             categories: categories,
-            errors: [{ msg: 'An error occurred while creating the item' }]
+            errors: [{ msg: 'An error occurred while creating the item' }],
           });
         }
       }
-  }];
+    }];
 
-  const destroy_get = async (req: Request, res: Response, next: NextFunction) => {
+  const destroy_get = async (req: Request, res: Response) => {
     const item = await Item.findById(req.params.id).exec();
 
     if (!item) {
@@ -145,14 +160,14 @@ const ItemController = (() => {
     body('admin_pw', 'Admin Password Required')
       .escape()
       .trim()
-      .custom((value, { req }) => {
+      .custom((value) => {
         if (value === EnvVars.AdminPassword) {
           return true;
         } else {
           return false;
         }
       }).withMessage('Wrong Admin Password'),
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: DeleteItemRequest, res: Response, next: NextFunction) => {
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -168,7 +183,7 @@ const ItemController = (() => {
           next(err);
         }
       }
-  }];
+    }];
 
   const store = [
     upload.single('img'),
@@ -196,7 +211,7 @@ const ItemController = (() => {
         }
         return true;
       }),
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: UpdateItemRequest, res: Response) => {
 
       const item = new Item({
         name: req.body.name,
@@ -204,18 +219,18 @@ const ItemController = (() => {
         price: req.body.price,
         number_in_stock: req.body.number_in_stock,
         category: req.body.category,
-        img: req.file ? req.file.filename : undefined
+        img: req.file ? req.file.filename : undefined,
       });
 
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
-        const categories = await Category.find().sort( {"name": 1} ).exec();
+        const categories = await Category.find().sort( {'name': 1} ).exec();
         res.render('items/form', {
           title: 'Create Item',
           item: item,
           categories: categories,
-          errors: errors.array()
+          errors: errors.array(),
         });
         return;
       } else {
@@ -223,28 +238,27 @@ const ItemController = (() => {
           if (req.file) {
             const result = await cloudinary.v2.uploader.upload(req.file.path);
             item.img = result.secure_url; // Update the img field with the secure URL
-            console.log(item.img);
           }
 
           await item.save(); // Save the item after the image upload is complete
           res.redirect('/items'); // Redirect to the items list or another appropriate page
         } catch (err) {
           console.error('Error creating item:', err);
-          const categories = await Category.find().sort({ "name": 1 }).exec();
+          const categories = await Category.find().sort({ 'name': 1 }).exec();
           res.render('items/form', {
             title: 'Create Item',
             item: item,
             categories: categories,
-            errors: [{ msg: 'An error occurred while creating the item' }]
+            errors: [{ msg: 'An error occurred while creating the item' }],
           });
         }
       }
-  }];
+    }];
 
-  const edit = async (req: Request, res: Response, next: NextFunction) => {
+  const edit = async (req: Request, res: Response) => {
     const [item, categories] = await Promise.all([
       Item.findById(req.params.id).exec(),
-      Category.find().sort( {"name": 1} ).exec()
+      Category.find().sort( {'name': 1} ).exec(),
     ]);
 
     if (!item) {
@@ -252,7 +266,12 @@ const ItemController = (() => {
       return;
     }
 
-    res.render('items/form', { title: 'Edit Item', item: item, categories: categories, secure: true });
+    res.render('items/form', {
+      title: 'Edit Item',
+      item: item,
+      categories: categories,
+      secure: true,
+    });
   };
 
   return {
@@ -263,7 +282,7 @@ const ItemController = (() => {
     destroy_get,
     destroy_post,
     store,
-    edit
+    edit,
   };
 })();
 

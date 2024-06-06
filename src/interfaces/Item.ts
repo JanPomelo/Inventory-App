@@ -1,6 +1,6 @@
-import ICategory from "./Category";
+import ICategory from './Category';
 
-export default interface IItem {
+interface IItem {
   name: string;
   description: string;
   price: number;
@@ -9,3 +9,5 @@ export default interface IItem {
   category: ICategory;
   img?: string;
 }
+
+export default IItem;

@@ -1,8 +1,5 @@
 #! /usr/bin/env node
 
-console.log(
-  'This script populates some test items and categories to your database. Specified database as argument - e.g.: node populatedb "mongodb+srv://cooluser:coolpassword@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority"'
-);
 
 // Get arguments passed on command line
 const userArgs = process.argv.slice(2);
@@ -20,15 +17,12 @@ mongoose.set("strictQuery", false);
 
 const mongoDB = userArgs[0];
 
-main().catch((err) => console.log(err));
+main().catch((err) => console.error(err));
 
 async function main() {
-  console.log("Debug: About to connect");
   await mongoose.connect(mongoDB);
-  console.log("Debug: Should be connected?");
   await createCategories();
   await createItems();
-  console.log("Debug: Closing mongoose");
   mongoose.connection.close();
 }
 
@@ -43,7 +37,6 @@ async function categoryCreate(index, name, description, slug) {
   });
   categories[index] = category;
   await category.save();
-  console.log(`Added category: ${name}`);
 }
 
 async function itemCreate(index, name, description, price, number_in_stock, category) {
@@ -56,11 +49,9 @@ async function itemCreate(index, name, description, price, number_in_stock, cate
   });
   items[index] = item;
   await item.save();
-  console.log(`Added item: ${name}`);
 }
 
 async function createCategories() {
-  console.log("Adding categories");
   await Promise.all([
     categoryCreate(0, "Keyboards", "Mechanical keyboards - ready to use!", "keyboards"),
     categoryCreate(1, "Keycaps", "Keycaps for your mechanical keyboard", "keycaps"),
@@ -69,7 +60,6 @@ async function createCategories() {
 }
 
 async function createItems() {
-  console.log("Adding items");
   await Promise.all([
     itemCreate(0, "Ducky One 2 Mini", "60% mechanical keyboard", 100, 10, categories[0]),
     itemCreate(1, "GMK Laser", "Keycap set", 50, 20, categories[1]),

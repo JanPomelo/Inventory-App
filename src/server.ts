@@ -81,8 +81,8 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
 // Add APIs, must be after middleware
 app.use(Paths.Base, BaseRouter);
 
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-       res.render('home');
+app.get('/', (req: Request, res: Response) => {
+  res.render('home');
 });
 
 app.use('/items', ItemsRouter);
