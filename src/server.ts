@@ -72,8 +72,8 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
   app.use(compression());
   app.use(helmet.contentSecurityPolicy({
     directives: {
-      "script-src": ["'self'", 'code.jquery.com', 'cdn.jsdelivr.net'],
-      "img-src": ["'self'", 'res.cloudinary.com'],
+      'script-src': ["'self'", 'code.jquery.com', 'cdn.jsdelivr.net'],
+      'img-src': ["'self'", 'res.cloudinary.com'],
     },
   }));
   const limiter = rateLimit({
