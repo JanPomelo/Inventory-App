@@ -55,7 +55,12 @@ if (EnvVars_1.default.NodeEnv === misc_1.NodeEnvs.Dev.valueOf()) {
 }
 if (EnvVars_1.default.NodeEnv === misc_1.NodeEnvs.Production.valueOf()) {
     app.use((0, compression_1.default)());
-    app.use((0, helmet_1.default)());
+    app.use(helmet_1.default.contentSecurityPolicy({
+        directives: {
+            "script-src": ["'self'", 'code.jquery.com', 'cdn.jsdelivr.net'],
+            "img-src": ["'self'", 'res.cloudinary.com'],
+        },
+    }));
     const limiter = (0, express_rate_limit_1.rateLimit)({
         windowMs: 1 * 60 * 1000,
         max: 20,
@@ -63,7 +68,7 @@ if (EnvVars_1.default.NodeEnv === misc_1.NodeEnvs.Production.valueOf()) {
     app.use(limiter);
 }
 app.use(Paths_1.default.Base, api_1.default);
-app.get('/', (req, res, next) => {
+app.get('/', (req, res) => {
     res.render('home');
 });
 app.use('/items', items_1.ItemsRouter);

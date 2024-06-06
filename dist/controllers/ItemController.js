@@ -20,31 +20,37 @@ const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.diskStorage({
     filename: function (req, file, cb) {
         cb(null, file.originalname);
-    }
+    },
 });
 const upload = (0, multer_1.default)({ storage: storage });
 const cloudinary_1 = __importDefault(require("cloudinary"));
 cloudinary_1.default.v2.config({
     cloud_name: EnvVars_1.default.Cloudinary.AppName,
     api_key: EnvVars_1.default.Cloudinary.ApiKey,
-    api_secret: EnvVars_1.default.Cloudinary.ApiSecret
+    api_secret: EnvVars_1.default.Cloudinary.ApiSecret,
 });
 const ItemController = (() => {
-    const index = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const items = yield Item_1.default.find().exec();
-        res.render('items/index', { title: "Items", items: items });
+        res.render('items/index', { title: 'Items', items: items });
     });
-    const show = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const show = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const item = yield Item_1.default.findById(req.params.id).populate('category').exec();
         if (!item) {
             res.status(404).send('Item not found');
             return;
         }
-        res.render('items/show', { title: item.name, item: item });
+        res.render('items/show', {
+            title: item.name,
+            item: item,
+        });
     });
-    const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const categories = yield Category_1.default.find().sort({ "name": 1 }).exec();
-        res.render('items/form', { title: 'Create Item', categories: categories });
+    const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const categories = yield Category_1.default.find().sort({ 'name': 1 }).exec();
+        res.render('items/form', {
+            title: 'Create Item',
+            categories: categories,
+        });
     });
     const update = [
         upload.single('img'),
@@ -54,13 +60,15 @@ const ItemController = (() => {
             .escape(),
         (0, express_validator_1.body)('description', 'Description is required')
             .trim()
-            .isLength({ min: 3 }).withMessage('Description must have at least 3 characters')
+            .isLength({ min: 3 })
+            .withMessage('Description must have at least 3 characters')
             .escape(),
         (0, express_validator_1.body)('price', 'Price is required')
             .isFloat({ min: 0 }).withMessage('Price must be a positive number')
             .escape(),
         (0, express_validator_1.body)('number_in_stock', 'Number in stock is required')
-            .isInt({ min: 0 }).withMessage('Number in stock must be a positive integer')
+            .isInt({ min: 0 })
+            .withMessage('Number in stock must be a positive integer')
             .escape(),
         (0, express_validator_1.body)('category', 'Category is required')
             .isLength({ min: 1 })
@@ -68,7 +76,7 @@ const ItemController = (() => {
         (0, express_validator_1.body)('admin_pw', 'Admin Password Required')
             .escape()
             .trim()
-            .custom((value, { req }) => {
+            .custom((value) => {
             if (value === EnvVars_1.default.AdminPassword) {
                 return true;
             }
@@ -76,7 +84,7 @@ const ItemController = (() => {
                 return false;
             }
         }).withMessage('Wrong Admin Password'),
-        (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const item = new Item_1.default({
                 name: req.body.name,
                 description: req.body.description,
@@ -84,17 +92,17 @@ const ItemController = (() => {
                 number_in_stock: req.body.number_in_stock,
                 category: req.body.category,
                 _id: req.params.id,
-                img: req.file ? req.file.filename : undefined
+                img: req.file ? req.file.filename : undefined,
             });
             const errors = (0, express_validator_1.validationResult)(req);
             if (!errors.isEmpty()) {
-                const categories = yield Category_1.default.find().sort({ "name": 1 }).exec();
+                const categories = yield Category_1.default.find().sort({ 'name': 1 }).exec();
                 res.render('items/form', {
                     title: 'Edit Item',
                     item: item,
                     categories: categories,
                     secure: true,
-                    errors: errors.array()
+                    errors: errors.array(),
                 });
                 return;
             }
@@ -123,18 +131,18 @@ const ItemController = (() => {
                 }
                 catch (err) {
                     console.error('Error creating item:', err);
-                    const categories = yield Category_1.default.find().sort({ "name": 1 }).exec();
+                    const categories = yield Category_1.default.find().sort({ 'name': 1 }).exec();
                     res.render('items/form', {
                         title: 'Create Item',
                         item: item,
                         categories: categories,
-                        errors: [{ msg: 'An error occurred while creating the item' }]
+                        errors: [{ msg: 'An error occurred while creating the item' }],
                     });
                 }
             }
         })
     ];
-    const destroy_get = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const destroy_get = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const item = yield Item_1.default.findById(req.params.id).exec();
         if (!item) {
             res.status(404).send('Item not found');
@@ -146,7 +154,7 @@ const ItemController = (() => {
         (0, express_validator_1.body)('admin_pw', 'Admin Password Required')
             .escape()
             .trim()
-            .custom((value, { req }) => {
+            .custom((value) => {
             if (value === EnvVars_1.default.AdminPassword) {
                 return true;
             }
@@ -198,23 +206,23 @@ const ItemController = (() => {
             }
             return true;
         }),
-        (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const item = new Item_1.default({
                 name: req.body.name,
                 description: req.body.description,
                 price: req.body.price,
                 number_in_stock: req.body.number_in_stock,
                 category: req.body.category,
-                img: req.file ? req.file.filename : undefined
+                img: req.file ? req.file.filename : undefined,
             });
             const errors = (0, express_validator_1.validationResult)(req);
             if (!errors.isEmpty()) {
-                const categories = yield Category_1.default.find().sort({ "name": 1 }).exec();
+                const categories = yield Category_1.default.find().sort({ 'name': 1 }).exec();
                 res.render('items/form', {
                     title: 'Create Item',
                     item: item,
                     categories: categories,
-                    errors: errors.array()
+                    errors: errors.array(),
                 });
                 return;
             }
@@ -223,34 +231,38 @@ const ItemController = (() => {
                     if (req.file) {
                         const result = yield cloudinary_1.default.v2.uploader.upload(req.file.path);
                         item.img = result.secure_url;
-                        console.log(item.img);
                     }
                     yield item.save();
                     res.redirect('/items');
                 }
                 catch (err) {
                     console.error('Error creating item:', err);
-                    const categories = yield Category_1.default.find().sort({ "name": 1 }).exec();
+                    const categories = yield Category_1.default.find().sort({ 'name': 1 }).exec();
                     res.render('items/form', {
                         title: 'Create Item',
                         item: item,
                         categories: categories,
-                        errors: [{ msg: 'An error occurred while creating the item' }]
+                        errors: [{ msg: 'An error occurred while creating the item' }],
                     });
                 }
             }
         })
     ];
-    const edit = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const [item, categories] = yield Promise.all([
             Item_1.default.findById(req.params.id).exec(),
-            Category_1.default.find().sort({ "name": 1 }).exec()
+            Category_1.default.find().sort({ 'name': 1 }).exec(),
         ]);
         if (!item) {
             res.status(404).send('Item not found');
             return;
         }
-        res.render('items/form', { title: 'Edit Item', item: item, categories: categories, secure: true });
+        res.render('items/form', {
+            title: 'Edit Item',
+            item: item,
+            categories: categories,
+            secure: true,
+        });
     });
     return {
         index,
@@ -260,7 +272,7 @@ const ItemController = (() => {
         destroy_get,
         destroy_post,
         store,
-        edit
+        edit,
     };
 })();
 exports.default = ItemController;

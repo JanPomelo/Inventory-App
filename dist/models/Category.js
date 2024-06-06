@@ -29,7 +29,7 @@ const CategorySchema = new mongoose_1.Schema({
     description: { type: String, required: true, minlength: 3, maxlength: 1000 },
 });
 CategorySchema.virtual('url').get(function () {
-    return '/categories/' + this._id;
+    return `/categories/${this._id}`;
 });
 const Category = mongoose_1.default.model('Category', CategorySchema);
 exports.default = Category;
