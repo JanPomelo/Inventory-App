@@ -1,0 +1,12 @@
+extends ../layout
+block content
+  h1.text-2xl.font-bold.mb-8= title
+  if (categories.length)
+    ul.ml-4
+      each category in categories
+        li.mb-4
+          div.flex.justify-between
+          a.text-lg.mb-2.underline(href=category.url)= category.name
+  else
+    p No categories!
+

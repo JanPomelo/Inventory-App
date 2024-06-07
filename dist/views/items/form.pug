@@ -1,0 +1,62 @@
+extends ../layout
+
+block content
+  h1.text-2xl.font-bold.mb-8= title
+  form(method="POST" enctype="multipart/form-data")
+    .mb-6.flex.flex-col.gap-2
+      label(for='name' class="text-slate-500 uppercase text-xs") Name:
+      input#name.border.border-grey-500.rounded-lg.px-2.py-1(
+        type='text',
+        placeholder='Keyboards, Lubing Stations etc.'
+        name='name'
+        required
+        value=(undefined===item ? '' : item.name) )
+    .mb-6.flex.flex-col.gap-2
+      label(for='description' class="text-slate-500 uppercase text-xs") Description:
+      textarea#description.border.border-grey-500.rounded-lg.px-2.py-1(
+        placeholder='A brief description of the item'
+        name='description'
+        required)= undefined===item ? '' : item.description
+    .mb-6.flex.flex-col.gap-2
+      label(for='price' class="text-slate-500 uppercase text-xs") Price (USD):
+      input#price.border.border-grey-500.rounded-lg.px-2.py-1(
+        type='number',
+        placeholder='Price of the item in USD'
+        name='price'
+        step='0.01'
+        required
+        value=(undefined===item ? '' : item.price) )
+    .mb-6.flex.flex-col.gap-2
+      label(for='stock_in_stock' class="text-slate-500 uppercase text-xs") Number in Stock:
+      input#number_in_stock.border.border-grey-500.rounded-lg.px-2.py-1(
+        type='number',
+        placeholder='Number of items in stock'
+        name='number_in_stock'
+        required
+        value=(undefined===item ? '' : item.number_in_stock) )
+    .mb-6.flex.flex-col.gap-2
+      label(for='category' class="text-slate-500 uppercase text-xs") Category:
+      select#category.border.border-grey-500.rounded-lg.px-2.py-1(
+        name='category'
+        required )
+        option(value='') --Please select a category--
+        each category in categories
+          if item
+            option(
+              value=category._id
+              selected= item.category._id.toString()===category._id.toString()) #{category.name}
+          else
+            option(value=category._id) #{category.name}
+    if secure
+      .mb-6.flex.flex-col.gap-2
+        label(for='admin_pw' class="text-slate-500 uppercase text-xs") Admin Password:
+        input#admin_pw.border.border-grey-500.rounded-lg.px-2.py-1(type='password'
+          name='admin_pw'
+          required)
+    .mb-6.flex.flex-col.gap-2
+      input.rounded-lg.px-2.py-1(type='file' name='img' accept='image/*' source=undefined===item? '' : item.img)
+    button.rounded-lg.border.border-grey-500.py-1.px-2.mb-6(type='submit' class="hover:bg-gray-300" style="background-color: #C39C4E; color: #FFFFFF;") Submit
+    if errors
+      ul
+        for error in errors
+          li!= error.msg

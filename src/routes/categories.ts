@@ -12,4 +12,4 @@ router.get('/:id/delete', CategoryController.destroy_get);
 router.post('/:id/delete', CategoryController.destroy_post);
 
 
-export { router as CategoriesRouter }
+export { router as CategoriesRouter };

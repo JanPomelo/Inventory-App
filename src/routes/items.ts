@@ -10,6 +10,6 @@ router.get('/:id/edit', ItemController.edit);
 router.post('/:id/edit', ItemController.update);
 router.get('/:id/delete', ItemController.destroy_get);
 router.post('/:id/delete', ItemController.destroy_post);
-export { router as ItemsRouter }
+export { router as ItemsRouter };
 
 
